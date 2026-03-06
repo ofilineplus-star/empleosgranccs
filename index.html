@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleos Gran Caracas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        
+        /* FONDO CORPORATIVO IMPACTANTE */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+
+        /* LOGO GIRATORIO AL ENTRAR */
+        .logo-container {
+            margin-bottom: 20px;
+            animation: aparecerGirando 2s ease-out forwards;
+        }
+        .logo-img { width: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        @keyframes aparecerGirando {
+            from { transform: rotate(-720deg) scale(0); opacity: 0; }
+            to { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        /* MENSAJE INTERACTIVO FADE IN/OUT */
+        .welcome-box {
+            text-align: center; background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); padding: 40px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2); width: 90%; max-width: 500px;
+        }
+        #fade-text { font-size: 1.8rem; margin-bottom: 20px; transition: opacity 1s; opacity: 1; min-height: 80px; }
+        .fade-out { opacity: 0 !important; }
+
+        /* FORMULARIO */
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 1rem; }
+        .btn { width: 100%; padding: 12px; background: #00d4ff; border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        .btn:hover { background: #008fb3; transform: scale(1.02); }
+        .footer-links { margin-top: 15px; font-size: 0.8rem; }
+        .footer-links a { color: #00d4ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="logo-container">
+           <img src="logo.png" alt="Logo" class="logo-img">
+        </div>
+
+        <div class="welcome-box">
+            <h2 id="fade-text">Tu futuro profesional comienza hoy.</h2>
+            
+<form action="dashboard-candidato.html">
+    <input type="email" placeholder="Correo Electrónico" required>
+    <input type="password" placeholder="Contraseña" required>
+    <button type="submit" class="btn">Iniciar Sesión</button>
+</form>
+
+
+            
+
+<div class="footer-links">
+    <a href="#">¿Olvidaste tu contraseña?</a> | 
+    <a href="registro.html" style="text-decoration: none;">
+        <button type="button" style="background:none; border:none; color:#00d4ff; cursor:pointer; font-weight:bold; font-family:'Montserrat';">
+            Registrarse ahora
+        </button>
+    </a>
+</div>
+
+
+
+
+    <script>
+        const msgs = ["Tu futuro profesional comienza hoy.", "El cambio lo haces tú.", "Tus primeros pasos empiezan aquí."];
+        let i = 0;
+        const txt = document.getElementById("fade-text");
+
+        setInterval(() => {
+            txt.classList.add("fade-out");
+            setTimeout(() => {
+                i = (i + 1) % msgs.length;
+                txt.innerText = msgs[i];
+                txt.classList.remove("fade-out");
+            }, 1000);
+        }, 4000);
+    </script>
+</body>
+</html>
+

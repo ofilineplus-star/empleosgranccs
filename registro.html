@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Empleos Gran Caracas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover;
+            display: flex; align-items: center; justify-content: center; color: white; padding: 20px;
+        }
+
+        .register-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); padding: 30px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2); width: 95%; max-width: 500px;
+        }
+
+        h2 { text-align: center; margin-bottom: 20px; color: #00d4ff; }
+        
+        label { font-size: 0.8rem; margin-left: 5px; color: #ddd; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; font-size: 1rem; outline: none; }
+        
+        /* Estilo para que el select se vea bien */
+        select { background: white; color: #333; cursor: pointer; }
+
+        .btn-register { width: 100%; padding: 12px; background: #00d4ff; border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1.1rem; margin-top: 15px; }
+        .btn-register:hover { background: #008fb3; transform: scale(1.02); }
+
+        .btn-home { display: block; text-align: center; margin-top: 20px; color: white; text-decoration: none; font-size: 0.9rem; border: 1px solid #00d4ff; padding: 10px; border-radius: 8px; transition: 0.3s; }
+        .btn-home:hover { background: rgba(0, 212, 255, 0.2); }
+
+        /* Ocultar campos específicos de candidato inicialmente */
+        #campos-candidato { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="register-box">
+            <h2>Crear Cuenta</h2>
+            
+            <form id="formRegistro" action="index.html">
+                <label>Tipo de Registro</label>
+                <select id="tipoRegistro" required onchange="mostrarCampos()">
+                    <option value="" disabled selected>Selecciona una opción</option>
+                    <option value="candidato">Candidato (Busco Empleo)</option>
+                    <option value="empresa">Empresa (Busco Talento)</option>
+                </select>
+
+                <input type="text" placeholder="Nombre completo" required>
+
+                <div id="campos-candidato">
+                    <input type="text" placeholder="Profesión">
+                    <input type="number" placeholder="Cédula">
+                    <input type="number" placeholder="Edad">
+                </div>
+
+                <input type="email" placeholder="Correo Electrónico" required>
+                <input type="password" id="pass" placeholder="Contraseña" required>
+                <input type="password" id="passConfirm" placeholder="Verificación de contraseña" required>
+
+                <button type="button" class="btn-register">Registrarse ahora</button>
+            </form>
+
+            <a href="index.html" class="btn-home">Página Principal para Iniciar Sesión</a>
+        </div>
+    </div>
+
+    <script>
+        // Función para mostrar/ocultar campos según el tipo de usuario
+        function mostrarCampos() {
+            const tipo = document.getElementById('tipoRegistro').value;
+            const camposCandidato = document.getElementById('campos-candidato');
+            
+            if (tipo === 'candidato') {
+                camposCandidato.style.display = 'block';
+            } else {
+                camposCandidato.style.display = 'none';
+            }
+        }
+
+        // Validación simple de contraseñas
+        document.getElementById('formRegistro').addEventListener('submit', function(e) {
+            const p1 = document.getElementById('pass').value;
+            const p2 = document.getElementById('passConfirm').value;
+
+            if (p1 !== p2) {
+                e.preventDefault();
+                alert("Las contraseñas no coinciden. Por favor, verifica.");
+            } else {
+                alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+            }
+        });
+    </script>
+</body>
+</html>
+

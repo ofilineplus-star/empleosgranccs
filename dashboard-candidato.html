@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Candidato | Empleos Gran Caracas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* NAVBAR */
+        nav { background: rgba(0, 0, 0, 0.9); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-logo { font-weight: bold; font-size: 1.2rem; color: #00d4ff; }
+        .xp-badge { background: #00d4ff; color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
+
+        /* TABS */
+        .tabs-container { background: white; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 60px; z-index: 999; }
+        .tab-btn { border: none; background: none; padding: 12px 15px; cursor: pointer; font-weight: bold; color: #555; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 0.85rem; }
+        .tab-btn.active { color: #00d4ff; border-bottom: 3px solid #00d4ff; }
+
+        /* HERO BANNER */
+        .hero-banner {
+            width: 100%; height: 250px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069') no-repeat center center/cover;
+            display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: 20px;
+        }
+
+        .main-container { padding: 30px 5%; max-width: 1200px; margin: auto; flex: 1; width: 100%; }
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS */
+        .card-white { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .section-title { border-left: 5px solid #00d4ff; padding-left: 15px; margin-bottom: 20px; color: #333; }
+
+        /* DESAFIOS */
+        .grid-desafios { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 20px; }
+        .card-desafio { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
+        .card-desafio:hover:not(.locked) { border-color: #00d4ff; transform: translateY(-3px); background: #f0fbff; }
+        .card-desafio.locked { opacity: 0.5; background: #eee; cursor: not-allowed; }
+
+        /* MODAL & INPUTS */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        .modal-content { background: #1a1a2e; color: white; padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; border: 2px solid #00d4ff; }
+        .option-btn { display: block; width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #00d4ff; border-radius: 25px; background: transparent; color: white; cursor: pointer; text-align: left; }
+        .input-style { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        .correct { background: #28a745 !important; border-color: #28a745; }
+        .incorrect { background: #dc3545 !important; border-color: #dc3545; }
+
+        /* CONTACTO */
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .btn-main { background: #00d4ff; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn-main:hover { background: #00a8cc; }
+
+        footer { background: #1a1a1a; color: white; padding: 40px 5%; text-align: center; margin-top: auto; }
+        .footer-link { color: #00d4ff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">EMPLEOS GRAN CARACAS</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="xp-badge">XP: <span id="userXP">0</span></div>
+            <img id="navUserImg" src="" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+        </div>
+    </nav>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="openTab(event, 'inicio')">Inicio</button>
+        <button class="tab-btn" onclick="openTab(event, 'vacantes')">Vacantes</button>
+        <button class="tab-btn" onclick="openTab(event, 'desafios')">Desafíos XP</button>
+        <button class="tab-btn" onclick="openTab(event, 'forum')">Fórum</button>
+        <button class="tab-btn" onclick="openTab(event, 'contacto')">Contacto</button>
+        <button class="tab-btn" onclick="openTab(event, 'curriculum')">Perfil</button>
+    </div>
+
+    <div id="inicio" class="tab-content active">
+        <div class="hero-banner">
+            <h1>EL PORTAL DEL EXITO</h1>
+            <p>CONECTANDO EL TALENTO CON LA EXCELENCIA EN CARACAS</p>
+        </div>
+        <div class="main-container">
+            <div class="card-white">
+                <h2 class="section-title">¿Quiénes Somos?</h2>
+                <p>Somos la plataforma líder en gestión de talento humano en la Gran Caracas, dedicada a transformar la búsqueda de empleo en una experiencia de crecimiento profesional y personal.</p>
+                
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="card-white">
+                    <h3 class="section-title">Nuestra Misión</h3>
+                    <p>Empoderar a los trabajadores venezolanos mediante herramientas tecnológicas y educativas que les permitan alcanzar su máximo potencial, facilitando el encuentro con empresas que valoran la excelencia.</p>
+                </div>
+                <div class="card-white">
+                    <h3 class="section-title">Nuestra Visión</h3>
+                    <p>Ser el ecosistema laboral más innovador de Venezuela, reconocido por erradicar las barreras de acceso al empleo digno y por ser el motor de desarrollo profesional para las nuevas generaciones.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="vacantes" class="tab-content">
+        <div class="main-container">
+            <h2 class="section-title">Oportunidades Laborales Recientes</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                
+                <div class="card-white" style="border-top: 5px solid #6a1b9a; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color:#6a1b9a; margin-bottom:10px;">FarmaGO Altagracia</h3>
+                        <p><strong>Cargos:</strong> Asistente de Ventas, Supervisores y Regente.</p>
+                        <p style="font-size: 0.9rem; margin-top:10px; color:#555;">Jornada de captación: Viernes 06 de marzo (8:00 AM - 12:00 PM).</p>
+                        <p style="font-size: 0.8rem; color:#888;">Ubicación: Res. Stolmar, Altagracia.</p>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <span style="display:block; font-size:0.75rem; margin-bottom:5px;">Llevar CV, Cédula y RIF</span>
+                        <button class="btn-main" style="background:#6a1b9a;">Ver Ubicación</button>
+                    </div>
+                </div>
+
+                <div class="card-white" style="border-top: 5px solid #f39c12; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color:#f39c12; margin-bottom:10px;">Operador de Plotter</h3>
+                        <p><strong>Empresa:</strong> Nubeshop C.A.</p>
+                        <p style="font-size: 0.9rem; margin-top:10px; color:#555;">Requisitos: Manejo de formatos de impresión. Edad: 18-30 años.</p>
+                        <p style="font-size: 0.8rem; color:#888;">Zona: Parque Central.</p>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <a href="mailto:nubeshopca@gmail.com" style="text-decoration:none;">
+                            <button class="btn-main" style="background:#f39c12;">Enviar CV por Correo</button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-white" style="border-top: 5px solid #e67e22; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color:#e67e22; margin-bottom:10px;">Grupo Mercosur</h3>
+                        <p><strong>Cargos:</strong> Especialista en Redes, Analista TI, Gerente de Cumplimiento.</p>
+                        <p style="font-size: 0.9rem; margin-top:10px; color:#555;">Únete a la casa de bolsa líder.</p>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <a href="mailto:rrhh@mercosur.com.ve" style="text-decoration:none;">
+                            <button class="btn-main" style="background:#e67e22;">Postularme ahora</button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-white" style="border-top: 5px solid #2980b9; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color:#2980b9; margin-bottom:10px;">Asesor de Ventas</h3>
+                        <p><strong>Modalidad:</strong> Remoto (Comisión por venta).</p>
+                        <p style="font-size: 0.9rem; margin-top:10px; color:#555;">Rubro Odontológico. Edad: 20-30 años.</p>
+                        <p style="font-size: 0.8rem; color:#888;">Ubicación oficina: El Rosal, Chacao.</p>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <a href="https://wa.me/584242522262" target="_blank" style="text-decoration:none;">
+                            <button class="btn-main" style="background:#2ecc71;"><i class="fab fa-whatsapp"></i> Contactar WhatsApp</button>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div id="desafios" class="tab-content">
+        <div class="main-container">
+            <h2 style="text-align:center; margin-bottom:10px;">Ruta Crítica Profesional</h2>
+            <p style="text-align:center; color:#666; margin-bottom:20px;">Completa niveles para desbloquear tu certificado</p>
+            <div class="grid-desafios" id="gridDesafios"></div>
+        </div>
+    </div>
+
+    <div id="forum" class="tab-content">
+        <div class="main-container">
+            <div class="forum-input-box card-white">
+                <textarea id="postInput" class="input-style" rows="3" placeholder="¿Qué quieres compartir con la comunidad?"></textarea>
+                <button onclick="addPost()" class="btn-main" style="width:auto; float:right;">Publicar</button>
+                <div style="clear:both;"></div>
+            </div>
+            <div id="postsContainer"></div>
+        </div>
+    </div>
+
+    <div id="contacto" class="tab-content">
+        <div class="main-container">
+            <div class="contact-grid">
+                <div class="card-white">
+                    <h2 class="section-title">Contáctanos</h2>
+                    <form action="mailto:gianninismorenop@gmail.com" method="post" enctype="text/plain">
+                        <input type="text" placeholder="Nombre completo" class="input-style" required>
+                        <input type="email" placeholder="Correo electrónico" class="input-style" required>
+                        <textarea placeholder="¿En qué podemos ayudarte?" class="input-style" style="height:120px;" required></textarea>
+                        <button type="submit" class="btn-main">ENVIAR MENSAJE</button>
+                    </form>
+                </div>
+                <div class="card-white">
+                    <h2 class="section-title">Canales Oficiales</h2>
+                    <p style="margin-bottom:15px;">Estamos disponibles para asesorías y soporte técnico:</p>
+                    <p style="margin: 10px 0;"><i class="fab fa-whatsapp" style="color:#25d366; font-size:1.2rem;"></i> WhatsApp: <a href="https://wa.me/584241574576" target="_blank" class="footer-link">0424-1574576</a></p>
+                    <p style="margin: 10px 0;"><i class="fab fa-instagram" style="color:#e1306c; font-size:1.2rem;"></i> Instagram: <a href="https://instagram.com/empleos_grancaracas" target="_blank" class="footer-link">@empleos_grancaracas</a></p>
+                    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                    <p><strong>Ubicación:</strong> Caracas, Distrito Capital, Venezuela.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="curriculum" class="tab-content">
+        <div class="main-container" style="text-align:center;">
+            <div class="card-white" style="max-width:750px; margin:auto; text-align:left;">
+                
+                <div style="text-align:center; margin-bottom:30px;">
+                    <div style="position:relative; display:inline-block;">
+                        <img id="profilePreview" src="" style="width:130px; height:130px; border-radius:50%; border:5px solid #00d4ff; object-fit:cover;">
+                        <button onclick="document.getElementById('fileInput').click()" style="position:absolute; bottom:5px; right:5px; background:#00d4ff; border:none; border-radius:50%; width:35px; height:35px; color:white; cursor:pointer;"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                    <input type="file" id="fileInput" style="display:none" onchange="previewImage(this)">
+                    <h2 id="profileNameDisplay" style="margin-top:15px;">Nombre</h2>
+                    <p id="userRango" style="color:#00d4ff; font-weight:bold; font-size:1.1rem;">Rango: Novato</p>
+                    <div class="xp-badge" style="display:inline-block; margin-top:5px;">Total Acumulado: <span id="userXPDisplay">0</span> XP</div>
+                </div>
+
+                <hr style="margin-bottom:25px; border:0; border-top:1px solid #eee;">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="grid-column: span 2;">
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Nombre Completo</label>
+                        <input type="text" id="userNameInput" placeholder="Ej: Juan Pérez" class="input-style">
+                    </div>
+                    
+                    <div>
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Correo Electrónico</label>
+                        <input type="email" id="userEmailInput" placeholder="correo@ejemplo.com" class="input-style">
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Teléfono</label>
+                        <input type="tel" id="userPhoneInput" placeholder="0412-0000000" class="input-style">
+                    </div>
+
+                    <div>
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Profesión</label>
+                        <input type="text" id="userProfInput" placeholder="Ej: Administrador" class="input-style">
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Especialidad</label>
+                        <input type="text" id="userSpecInput" placeholder="Ej: Recursos Humanos" class="input-style">
+                    </div>
+
+                    <div style="grid-column: span 2; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #eee;">
+                        <label style="font-weight:bold; font-size:0.9rem; display:block; margin-bottom:10px; color:#333;">Último Empleo</label>
+                        <input type="text" id="lastJobInput" placeholder="Empresa / Cargo desempeñado" class="input-style">
+                        <div style="display:flex; gap:15px; margin-top:10px;">
+                            <div style="flex:1;">
+                                <small style="color:#888;">Fecha Inicio</small>
+                                <input type="date" id="jobStart" class="input-style">
+                            </div>
+                            <div style="flex:1;">
+                                <small style="color:#888;">Fecha Fin</small>
+                                <input type="date" id="jobEnd" class="input-style">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">¿Por qué se considera apto para formar parte de las empresas?</label>
+                        <textarea id="userAptoInput" class="input-style" rows="4" placeholder="Escriba aquí su propuesta de valor..."></textarea>
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label style="font-weight:bold; font-size:0.85rem; color:#555;">Subir Currículum (PDF)</label>
+                        <input type="file" id="cvFileInput" class="input-style" accept=".pdf">
+                    </div>
+                </div>
+
+                <button onclick="saveProfile()" class="btn-main" style="margin-top:20px; font-size:1rem;">GUARDAR PERFIL PROFESIONAL</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <h2 id="qTitle" style="color:#00d4ff; margin-bottom:15px;"></h2>
+            <p id="qDesc" style="margin-bottom:20px; font-weight:bold;"></p>
+            <div id="qOptions"></div>
+            <p id="qResult" style="margin-top:20px; font-weight:bold; text-align: center;"></p>
+            <button onclick="closeQuiz()" id="btnContinuar" style="margin-top:20px; display:none;" class="btn-main">Continuar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Empleos Gran Caracas | Creciendo contigo.</p>
+    </footer>
+
+    <script>
+        let userXP = parseInt(localStorage.getItem('userXP')) || 0;
+        let unlockedLevels = parseInt(localStorage.getItem('unlockedLevels')) || 1;
+        let currentUser = localStorage.getItem('userName') || "Candidato";
+        let currentPhoto = localStorage.getItem('userPhoto') || "";
+        let posts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+
+        const bancoDesafios = [
+            {id:1, t:"select", cat:"Ética", q:"¿Qué es el 'Soft Skill'?", a:"Habilidad interpersonal", o:["Herramienta de software","Habilidad interpersonal","Hardware blando"]},
+            {id:2, t:"text", cat:"Excel", q:"¿Cómo se llama la función en Excel para sumar celdas?", a:"suma"},
+            {id:3, t:"select", cat:"RRHH", q:"En una entrevista, ¿qué respondes ante tus debilidades?", a:"Una debilidad real con plan de mejora", o:["'No tengo ninguna'","Una debilidad real con plan de mejora","Culpar a mi ex-jefe"]},
+            {id:4, t:"text", cat:"RRHH", q:"¿Qué significan las siglas 'RRHH'?", a:"recursos humanos"},
+            {id:5, t:"select", cat:"Relaciones", q:"¿Qué es el 'Networking'?", a:"Crear red de contactos", o:["Vender por internet","Crear red de contactos","Reparar redes wifi"]},
+            {id:6, t:"text", cat:"Moneda", q:"¿Cuál es la moneda oficial de Venezuela?", a:"bolivar"},
+            {id:7, t:"select", cat:"Web", q:"¿Para qué sirve LinkedIn?", a:"Red profesional", o:["Ver películas","Red profesional","Pedir comida"]},
+            {id:8, t:"text", cat:"Documento", q:"Nombre del documento donde resumes tu vida laboral:", a:"curriculum"},
+            {id:9, t:"select", cat:"IA", q:"¿Qué es un 'Prompt' en IA?", a:"Instrucción para la IA", o:["Un virus","Instrucción para la IA","Un tipo de cable"]},
+            {id:10, t:"text", cat:"IA", q:"¿Cómo se abrevia 'Inteligencia Artificial'?", a:"ia"},
+            {id:11, t:"select", cat:"Comunicación", q:"¿Qué es ser asertivo?", a:"Hablar con respeto y firmeza", o:["Estar siempre de acuerdo","Hablar con respeto y firmeza","Gritar para que escuchen"]},
+            {id:12, t:"text", cat:"Office", q:"¿Qué programa se usa para presentaciones?", a:"powerpoint"},
+            {id:13, t:"select", cat:"Marketing", q:"¿Qué es el ROI?", a:"Retorno de Inversión", o:["Riesgo de Inundación","Retorno de Inversión","Regla de Operación"]},
+            {id:14, t:"text", cat:"Buscador", q:"¿Principal buscador de internet?", a:"google"},
+            {id:15, t:"select", cat:"Marca", q:"¿Qué es Employer Branding?", a:"Imagen de empresa para empleados", o:["Marca de ropa","Imagen de empresa para empleados","Venta de logos"]},
+            {id:16, t:"text", cat:"Nube", q:"Nombre de la nube de Google:", a:"google drive"},
+            {id:17, t:"select", cat:"Habilidad", q:"¿Qué es Feedback?", a:"Retroalimentación", o:["Regalo","Retroalimentación","Ruido"]},
+            {id:18, t:"text", cat:"PC", q:"Tecla para cancelar en PC:", a:"esc"},
+            {id:19, t:"select", cat:"Sistemas", q:"¿Qué es un CRM?", a:"Gestión de clientes", o:["Motor","Gestión de clientes","Certificado"]},
+            {id:20, t:"text", cat:"Web", q:"Dominio web de Venezuela:", a:".ve"},
+            {id:21, t:"select", cat:"Ética", q:"¿Qué es ética profesional?", a:"Valores en el trabajo", o:["Dinero rápido","Valores en el trabajo","Tener un título"]},
+            {id:22, t:"text", cat:"Digital", q:"¿Qué significa PDF?", a:"portable document format"},
+            {id:23, t:"select", cat:"Equipo", q:"¿Qué es trabajo en equipo?", a:"Cooperación común", o:["Hacer lo de otros","Cooperación común","Trabajar solo"]},
+            {id:24, t:"text", cat:"IA", q:"Nombre del bot de OpenAI:", a:"chatgpt"},
+            {id:25, t:"select", cat:"Liderazgo", q:"¿Qué es liderazgo?", a:"Influir positivamente", o:["Mandar","Influir positivamente","Ser dueño"]},
+            {id:26, t:"text", cat:"Excel", q:"Símbolo para iniciar fórmula:", a:"="},
+            {id:27, t:"select", cat:"Mente", q:"¿Qué es resiliencia?", a:"Superar crisis", o:["Fuerza física","Superar crisis","Sin sentimientos"]},
+            {id:28, t:"text", cat:"PC", q:"Sistema operativo más usado:", a:"windows"},
+            {id:29, t:"select", cat:"Fraude", q:"¿Qué es Phishing?", a:"Estafa por correo", o:["Deporte","Estafa por correo","Lenguaje"]},
+            {id:30, t:"text", cat:"Inglés", q:"¿Cómo se dice reunión?", a:"meeting"},
+            {id:31, t:"select", cat:"Meta", q:"¿Qué es productividad?", a:"Eficiencia de recursos", o:["Trabajar 20h","Eficiencia de recursos","Sin descanso"]},
+            {id:32, t:"text", cat:"Redes", q:"Red con logo de cámara:", a:"instagram"},
+            {id:33, t:"select", cat:"Marketing", q:"¿Qué es Marketing Digital?", a:"Publicidad digital", o:["Venta de casas","Publicidad digital","Llamadas"]},
+            {id:34, t:"text", cat:"Empleo", q:"Antónimo de empleado:", a:"empleador"},
+            {id:35, t:"select", cat:"Web", q:"¿Qué es Cloud?", a:"Almacenamiento web", o:["Clima","Almacenamiento web","Disco duro"]},
+            {id:36, t:"text", cat:"Apple", q:"Navegador de Apple:", a:"safari"},
+            {id:37, t:"select", cat:"Tiempo", q:"¿Qué es un Deadline?", a:"Fecha límite", o:["Línea muerta","Fecha límite","Dibujo"]},
+            {id:38, t:"text", cat:"Social", q:"Red de Elon Musk:", a:"x"},
+            {id:39, t:"select", cat:"Social", q:"¿Qué es Empatía?", a:"Ponerse en lugar de otro", o:["Lástima","Ponerse en lugar de otro","Caer bien"]},
+            {id:40, t:"text", cat:"Web", q:"Sigla de Search Engine Optimization:", a:"seo"},
+            {id:41, t:"select", cat:"RRHH", q:"¿Qué es Outsourcing?", a:"Subcontratación", o:["Vender fuera","Subcontratación","Despedir"]},
+            {id:42, t:"text", cat:"Lugar", q:"Continente de Venezuela:", a:"america"},
+            {id:43, t:"select", cat:"Ventas", q:"¿Atención al Cliente es?", a:"Servicio y apoyo", o:["Vender caro","Servicio y apoyo","Ignorar"]},
+            {id:44, t:"text", cat:"Google", q:"App de correos de Google:", a:"gmail"},
+            {id:45, t:"select", cat:"Ventas", q:"¿Qué es E-commerce?", a:"Comercio electrónico", o:["Economía","Comercio electrónico","Estrategia"]},
+            {id:46, t:"text", cat:"PC", q:"Parte física de la PC:", a:"hardware"},
+            {id:47, t:"select", cat:"Empleo", q:"¿Teletrabajo es?", a:"Trabajo remoto", o:["Ver TV","Trabajo remoto","Vender TV"]},
+            {id:48, t:"text", cat:"Redes", q:"Creador de Facebook:", a:"mark zuckerberg"},
+            {id:49, t:"select", cat:"Liderazgo", q:"¿Liderazgo Situacional?", a:"Adaptarse al contexto", o:["Lugar fijo","Adaptarse al contexto","No liderar"]},
+            {id:50, t:"text", cat:"Final", q:"ÚLTIMO NIVEL: Escribe ÉXITO:", a:"exito"}
+        ];
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    currentPhoto = e.target.result;
+                    document.getElementById('profilePreview').src = e.target.result;
+                    updateUI();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        
+        // FUNCIÓN DE GUARDA
+        function saveProfile() {
+            const n = document.getElementById('userNameInput').value;
+            const email = document.getElementById('userEmailInput').value;
+            const tel = document.getElementById('userPhoneInput').value;
+            const prof = document.getElementById('userProfInput').value;
+            const spec = document.getElementById('userSpecInput').value;
+            const job = document.getElementById('lastJobInput').value;
+            const start = document.getElementById('jobStart').value;
+            const end = document.getElementById('jobEnd').value;
+            const apto = document.getElementById('userAptoInput').value;
+
+            // Guardar datos básicos y foto
+            if(n) localStorage.setItem('userName', n);
+            if(currentPhoto) localStorage.setItem('userPhoto', currentPhoto);
+            
+            // Guardar datos profesionales en un objeto único
+            const profData = { email, tel, prof, spec, job, start, end, apto };
+            localStorage.setItem('userProfData', JSON.stringify(profData));
+
+            currentUser = n || currentUser;
+            updateUI();
+            alert("✅ Perfil profesional actualizado correctamente.");
+        }
+
+        // CARGAR DATOS AL INICIAR (Modifica tu window.onload actual)
+        window.onload = () => {
+            document.getElementById('userNameInput').value = currentUser !== "Candidato" ? currentUser : "";
+            
+            // Cargar datos profesionales extra
+            const savedProf = JSON.parse(localStorage.getItem('userProfData'));
+            if(savedProf) {
+                document.getElementById('userEmailInput').value = savedProf.email || "";
+                document.getElementById('userPhoneInput').value = savedProf.tel || "";
+                document.getElementById('userProfInput').value = savedProf.prof || "";
+                document.getElementById('userSpecInput').value = savedProf.spec || "";
+                document.getElementById('lastJobInput').value = savedProf.job || "";
+                document.getElementById('jobStart').value = savedProf.start || "";
+                document.getElementById('jobEnd').value = savedProf.end || "";
+                document.getElementById('userAptoInput').value = savedProf.apto || "";
+            }
+            updateUI();
+        };
+
+
+
+        function updateUI() {
+            const avatar = currentPhoto || `https://ui-avatars.com/api/?name=${currentUser}&background=00d4ff&color=fff`;
+            document.getElementById('userXP').innerText = userXP;
+            document.getElementById('userXPDisplay').innerText = userXP;
+            document.getElementById('navUserImg').src = avatar;
+            document.getElementById('profilePreview').src = avatar;
+            document.getElementById('profileNameDisplay').innerText = currentUser;
+            let rango = userXP >= 3000 ? "Master Pro" : (userXP >= 1000 ? "Estratega" : "Novato");
+            document.getElementById('userRango').innerText = "Rango: " + rango;
+            renderPosts();
+            renderDesafios();
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            posts.forEach((post) => {
+                const postPhoto = post.photo || `https://ui-avatars.com/api/?name=${post.author}&background=00d4ff&color=fff`;
+                container.innerHTML += `<div class="post-card card-white" style="border-left:5px solid #00d4ff">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <img src="${postPhoto}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                        <strong>${post.author}</strong>
+                    </div><p>${post.text}</p></div>`;
+            });
+        }
+
+        function addPost() {
+            const txt = document.getElementById('postInput').value;
+            if(!txt.trim()) return;
+            posts.unshift({ author: currentUser, photo: currentPhoto, text: txt });
+            document.getElementById('postInput').value = '';
+            localStorage.setItem('forumPosts', JSON.stringify(posts));
+            renderPosts();
+        }
+
+        function renderDesafios() {
+            const grid = document.getElementById('gridDesafios');
+            grid.innerHTML = '';
+            bancoDesafios.forEach(d => {
+                const isLocked = d.id > unlockedLevels;
+                grid.innerHTML += `<div class="card-desafio ${isLocked ? 'locked' : ''}" onclick="${isLocked ? '' : `openQuiz(${d.id})`}">
+                    <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-certificate'}" style="font-size:1.2rem; color:#00d4ff;"></i>
+                    <h4 style="font-size: 0.75rem; margin-top:5px;">Nivel ${d.id}</h4></div>`;
+            });
+        }
+
+        function openQuiz(id) {
+            const d = bancoDesafios[id-1];
+            document.getElementById('qTitle').innerText = d.cat;
+            document.getElementById('qDesc').innerText = d.q;
+            const optsDiv = document.getElementById('qOptions');
+            optsDiv.innerHTML = '';
+            document.getElementById('qResult').innerText = '';
+            document.getElementById('btnContinuar').style.display = 'none';
+
+            if(d.t === "select") {
+                d.o.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        if(opt === d.a) { btn.classList.add('correct'); processWin(id); }
+                        else { btn.classList.add('incorrect'); document.getElementById('qResult').innerText = "Vuelve a intentarlo"; }
+                    };
+                    optsDiv.appendChild(btn);
+                });
+            } else {
+                const inp = document.createElement('input');
+                inp.className = 'input-style';
+                inp.style.background = "rgba(255,255,255,0.1)";
+                inp.style.color = "white";
+                inp.placeholder = "Respuesta...";
+                const btnSub = document.createElement('button');
+                btnSub.className = 'btn-main';
+                btnSub.style.marginTop = "10px";
+                btnSub.innerText = "Verificar";
+                btnSub.onclick = () => {
+                    if(inp.value.toLowerCase().trim() === d.a.toLowerCase()) { processWin(id); }
+                    else { document.getElementById('qResult').innerText = "Incorrecto"; }
+                };
+                optsDiv.appendChild(inp);
+                optsDiv.appendChild(btnSub);
+            }
+            document.getElementById('quizModal').style.display = 'flex';
+        }
+
+        function processWin(id) {
+            document.getElementById('qResult').innerHTML = "<span style='color:#28a745'>¡EXCELENTE! +100 XP</span>";
+            userXP += 100;
+            if(id === unlockedLevels && unlockedLevels < 50) unlockedLevels++;
+            localStorage.setItem('userXP', userXP);
+            localStorage.setItem('unlockedLevels', unlockedLevels);
+            document.getElementById('btnContinuar').style.display = 'block';
+        }
+
+        function closeQuiz() { document.getElementById('quizModal').style.display = 'none'; updateUI(); }
+
+        function openTab(evt, tabName) {
+            let content = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < content.length; i++) content[i].style.display = "none";
+            let links = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < links.length; i++) links[i].classList.remove("active");
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+            window.scrollTo(0,0);
+        }
+
+        window.onload = () => {
+            document.getElementById('userNameInput').value = currentUser !== "Candidato" ? currentUser : "";
+            updateUI();
+        };
+    </script>
+</body>
+</html>
